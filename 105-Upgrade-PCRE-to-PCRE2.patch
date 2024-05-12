@@ -19,7 +19,7 @@ Signed-off-by: sbwml <984419930@qq.com>
 @@ -20,10 +20,10 @@ AC_DISABLE_STATIC
  AC_DISABLE_SHARED
  LT_INIT([dlopen])
-
+ 
 -dnl Check for pcre library
 -TS_CHECK_PCRE
 -if test "x${enable_pcre}" != "xyes"; then
@@ -29,7 +29,7 @@ Signed-off-by: sbwml <984419930@qq.com>
 +if test "x${enable_pcre2}" != "xyes"; then
 +  AC_MSG_ERROR([Cannot find pcre2 library. Configure --with-pcre2=DIR])
  fi
-
+ 
  dnl Checks for using shared libraries from system
 --- a/m4/pcre.m4
 +++ /dev/null
@@ -387,7 +387,7 @@ Signed-off-by: sbwml <984419930@qq.com>
 +            &errornumber,                /* for error number */
 +            &erroroffset,                /* for error offset */
 +            NULL);                       /* use default compile context */
-
+ 
 -        rule->pattern_re =
 -            pcre_compile(rule->pattern, 0, &reerr, &reerroffset, NULL);
          if (rule->pattern_re == NULL) {
@@ -408,7 +408,7 @@ Signed-off-by: sbwml <984419930@qq.com>
          }
      }
 @@ -109,8 +123,15 @@ lookup_rule(const struct cork_dllist *ru
-
+ 
      cork_dllist_foreach_void(rules, curr, next) {
          rule_t *rule = cork_container_of(curr, rule_t, entries);
 -        if (pcre_exec(rule->pattern_re, NULL,
@@ -424,10 +424,10 @@ Signed-off-by: sbwml <984419930@qq.com>
 +                ) >= 0)
              return rule;
      }
-
+ 
 @@ -131,7 +152,13 @@ free_rule(rule_t *rule)
          return;
-
+ 
      ss_free(rule->pattern);
 -    if (rule->pattern_re != NULL)
 -        pcre_free(rule->pattern_re);
@@ -444,9 +444,9 @@ Signed-off-by: sbwml <984419930@qq.com>
 --- a/src/rule.h
 +++ b/src/rule.h
 @@ -33,17 +33,27 @@
-
+ 
  #include <libcork/ds.h>
-
+ 
 -#ifdef HAVE_PCRE_H
 -#include <pcre.h>
 -#elif HAVE_PCRE_PCRE_H
@@ -466,14 +466,14 @@ Signed-off-by: sbwml <984419930@qq.com>
 +#define PCRE2_CODE_UNIT_WIDTH 8
 +
 +#include <pcre2.h>
-
+ 
  typedef struct rule {
      char *pattern;
-
+ 
      /* Runtime fields */
 -    pcre *pattern_re;
 +    pcre2_code *pattern_re;
 +    pcre2_match_data *pattern_re_match_data;
-
+ 
      struct cork_dllist_item entries;
  } rule_t;
